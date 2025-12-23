@@ -9,7 +9,7 @@
 ## Получение исходников
 
 ```bash
-git clone https://github.com/your-username/studyflow.git
+git clone https://github.com/SDVadim/TimeManagerApp.git
 cd studyflow
 ```
 
