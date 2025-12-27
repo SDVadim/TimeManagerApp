@@ -2,14 +2,21 @@
 
 Веб-приложение для управления учебными задачами и дедлайнами. Позволяет студентам создавать задачи, отслеживать дедлайны, отмечать выполненные задачи и просматривать статистику. Приложение построено на React + Redux на фронтенде и Node.js + Express + PostgreSQL на бэкенде.
 
-**Демо:** [Описание функциональности в разделе "Основной бизнес-кейс"]
+**Ключевые возможности:**
+- Создание и управление задачами с дедлайнами
+- Визуализация статистики выполнения
+- AI-помощник на базе ChatGPT для генерации решений
+- Многопользовательская система с персональными задачами
+- Архивация выполненных задач
+
+[**Презентация проекта**](https://sdvadim.github.io/Student_time_manager/)
 
 ---
 
 ## Получение исходников
 
 ```bash
-git clone https://github.com/your-username/studyflow.git
+git clone https://github.com/SDVadim/TimeManagerApp.git
 cd studyflow
 ```
 
@@ -54,12 +61,14 @@ cd ..
 PORT=4000
 DATABASE_URL=postgresql://studyflow:studyflow123@localhost:5432/studyflow
 NODE_ENV=development
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 **Значения по умолчанию:**
 - `PORT` - порт backend сервера (4000)
 - `DATABASE_URL` - строка подключения к PostgreSQL (используется при локальном запуске через Docker)
 - `NODE_ENV` - режим работы (development/production)
+- `OPENAI_API_KEY` - API ключ для интеграции с ChatGPT.
 
 ### 3. Запуск базы данных
 
@@ -147,7 +156,13 @@ npm run dev
   - Количество задач в работе
   - График выполнения задач
 
-**5. Просмотр данных в базе**
+**5. Использование AI-помощника (опционально)**
+- На главной странице кликните на любую задачу
+- Приложение отправит запрос к ChatGPT
+- Через несколько секунд появится AI-решение с рекомендациями
+- Для работы требуется настройка OpenAI API
+
+**6. Просмотр данных в базе**
 
 Подключитесь к PostgreSQL для проверки сохраненных данных:
 
@@ -163,71 +178,6 @@ SELECT id, title, subject, due_date, done FROM tasks;
 
 # Выход
 \q
-```
-
----
-
-## Структура приложения
-
-```
-V2/
-├── src/                          # Frontend исходники
-│   ├── main.tsx                  # Точка входа React приложения
-│   ├── App.tsx                   # Главный компонент с роутингом
-│   ├── styles.css                # Глобальные стили
-│   │
-│   ├── pages/                    # Страницы приложения
-│   │   ├── Login.tsx             # Страница входа
-│   │   ├── Register.tsx          # Страница регистрации
-│   │   ├── Dashboard.tsx         # Главная страница (дашборд)
-│   │   ├── TaskManager.tsx       # Управление задачами (CRUD)
-│   │   ├── Tasks.tsx             # Список задач
-│   │   ├── TaskForm.tsx          # Форма создания/редактирования задачи
-│   │   ├── Statistics.tsx        # Страница статистики
-│   │   ├── Home.tsx              # Домашняя страница
-│   │   └── About.tsx             # О приложении
-│   │
-│   ├── store/                    # Redux store
-│   │   ├── index.ts              # Настройка store, hooks (useAppDispatch, useAppSelector)
-│   │   ├── tasksSlice.ts         # Slice для управления задачами (actions, reducers, thunks)
-│   │   └── tasksSlice.test.ts    # Тесты для tasksSlice
-│   │
-│   └── utils/                    # Утилиты
-│       ├── api.ts                # API клиент (axios), функции для работы с backend
-│       └── auth.ts               # Утилиты аутентификации (устаревший, заменен на api.ts)
-│
-├── server/                       # Backend исходники
-│   ├── src/
-│   │   ├── server.ts             # Express сервер, middleware, запуск
-│   │   ├── db.ts                 # Подключение к PostgreSQL (pg pool)
-│   │   └── routes/               # API маршруты
-│   │       ├── auth.ts           # Маршруты аутентификации (register, login)
-│   │       └── tasks.ts          # Маршруты для задач (CRUD операции)
-│   │
-│   ├── init.sql                  # SQL скрипт инициализации БД (создание таблиц)
-│   ├── package.json              # Зависимости backend
-│   ├── tsconfig.json             # TypeScript конфигурация backend
-│   └── .env                      # Переменные окружения backend
-│
-├── cypress/                      # E2E тесты
-│   ├── e2e/
-│   │   └── studyflow.cy.ts       # Cypress тесты (регистрация, вход, CRUD задач)
-│   └── support/
-│       └── commands.ts           # Кастомные команды Cypress
-│
-├── docker-compose.yml            # Docker конфигурация для PostgreSQL
-├── cypress.config.ts             # Конфигурация Cypress
-├── vite.config.ts                # Конфигурация Vite (frontend bundler)
-├── tsconfig.json                 # TypeScript конфигурация frontend
-├── package.json                  # Зависимости и скрипты frontend
-│
-├── start-all.sh                  # Скрипт запуска всех сервисов
-├── stop-postgres.sh              # Скрипт остановки всех сервисов
-├── test-postgres.sh              # Скрипт тестирования интеграции
-├── test-e2e.sh                   # Скрипт запуска E2E тестов
-├── migrate-data.js               # Скрипт миграции данных из db.json в PostgreSQL
-│
-└── README.md                     # Документация
 ```
 
 ### Описание ключевых модулей
@@ -249,32 +199,3 @@ V2/
 - Таблица `tasks` - хранение задач (id, user_id, title, subject, due_date, done, notes, created_at, completed_at, archived, archived_at)
 - Индексы для оптимизации запросов по user_id, archived, done
 
----
-
-## Дополнительные команды
-
-### Тестирование
-
-```bash
-# Unit тесты
-npm test
-
-# E2E тесты (требуется запущенное приложение)
-./test-e2e.sh
-
-# Проверка интеграции с PostgreSQL
-./test-postgres.sh
-```
-
-### Работа с базой данных
-
-```bash
-# Просмотр таблиц
-docker exec studyflow_postgres psql -U studyflow -d studyflow -c "\dt"
-
-# Логи PostgreSQL
-docker-compose logs -f postgres
-
-# Остановка и удаление данных БД
-docker-compose down -v
-```

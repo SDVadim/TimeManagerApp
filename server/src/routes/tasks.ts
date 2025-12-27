@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../db';
+import { generateTaskSolution } from '../services/openai';
 
 const router = Router();
 
-// Получить все задачи пользователя
 router.get('/', async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
@@ -116,8 +116,6 @@ router.put('/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
     const { title, subject, dueDate, done, notes } = req.body;
 
-    // Если задача помечена как выполненная, устанавливаем completedAt
-    const completedAt = done ? 'NOW()' : 'NULL';
 
     const result = await query(
       `UPDATE tasks 
@@ -199,6 +197,28 @@ router.delete('/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting task:', error);
     res.status(500).json({ error: 'Failed to delete task' });
+  }
+});
+
+// Получить AI-решение для задачи
+router.post('/:id/ai-solution', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Получаем задачу из БД
+    const result = await query('SELECT * FROM tasks WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = result.rows[0];
+    const solution = await generateTaskSolution(task.title, task.notes);
+
+    res.json({ solution });
+  } catch (error) {
+    console.error('Error generating AI solution:', error);
+    res.status(500).json({ error: 'Failed to generate AI solution' });
   }
 });
 

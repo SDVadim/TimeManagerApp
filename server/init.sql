@@ -27,8 +27,3 @@ CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_archived ON tasks(archived);
 CREATE INDEX IF NOT EXISTS idx_tasks_done ON tasks(done);
 
--- Вставка тестового пользователя (опционально)
-INSERT INTO users (username, password, display_name)
-VALUES ('test', 'test123', 'Test User')
-ON CONFLICT (username) DO NOTHING;
-

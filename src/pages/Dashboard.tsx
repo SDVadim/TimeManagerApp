@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../store'
-import { fetchTasks, updateTask } from '../store/tasksSlice'
+import { fetchTasks, updateTask, fetchAiSolution } from '../store/tasksSlice'
 import { getCurrentUser, logout as logoutUser } from '../utils/api'
 import '../styles.css'
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { items: tasks, loading } = useAppSelector((state) => state.tasks)
+  const { items: tasks, loading, aiSolutions, loadingAiSolution } = useAppSelector((state) => state.tasks)
   const currentUser = getCurrentUser()
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!currentUser) {
@@ -28,6 +29,17 @@ export default function Dashboard() {
     const task = tasks.find((t) => t.id === taskId)
     if (task) {
       dispatch(updateTask({ ...task, done: !task.done }))
+    }
+  }
+
+  const handleTaskClick = (taskId: number) => {
+    if (selectedTaskId === taskId) {
+      setSelectedTaskId(null)
+    } else {
+      setSelectedTaskId(taskId)
+      if (!aiSolutions[taskId]) {
+        dispatch(fetchAiSolution(taskId))
+      }
     }
   }
 
@@ -118,13 +130,20 @@ export default function Dashboard() {
                 <div key={task.id} className="task-card">
                   <div className="task-card-header">
                     <button
-                      onClick={() => handleToggleDone(task.id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleDone(task.id)
+                      }}
                       className="task-checkbox"
                       aria-label="Отметить как выполненную"
                     >
                       <div className="checkbox-circle"></div>
                     </button>
-                    <div className="task-content">
+                    <div
+                      className="task-content"
+                      onClick={() => handleTaskClick(task.id)}
+                      style={{ cursor: 'pointer', flex: 1 }}
+                    >
                       <h3 className="task-title">{task.title}</h3>
                       {task.subject && (
                         <span className="task-subject">{task.subject}</span>
@@ -134,6 +153,24 @@ export default function Dashboard() {
 
                   {task.notes && (
                     <p className="task-notes">{task.notes}</p>
+                  )}
+
+                  {selectedTaskId === task.id && (
+                    <div className="ai-solution">
+                      <h4>🤖 AI-решение:</h4>
+                      {loadingAiSolution ? (
+                        <p className="ai-loading">⏳ Генерация решения...</p>
+                      ) : aiSolutions[task.id] ? (
+                        <p className={
+                          aiSolutions[task.id].includes('Ой, ошибка') ||
+                          aiSolutions[task.id].includes('❌')
+                            ? 'ai-error'
+                            : ''
+                        }>{aiSolutions[task.id]}</p>
+                      ) : (
+                        <p className="ai-error">❌ Решение недоступно</p>
+                      )}
+                    </div>
                   )}
 
                   <div className="task-footer">
