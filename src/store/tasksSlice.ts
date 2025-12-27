@@ -33,7 +33,8 @@ const initialState: TasksState = {
   loadingAiSolution: false
 }
 
-const API_URL = 'http://localhost:4000/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const API_URL = `${API_BASE_URL}/api`
 
 export const fetchTasks = createAsyncThunk('tasks/fetch', async (userId: number) => {
   const res = await axios.get<Task[]>(`${API_URL}/tasks?userId=${userId}`)
