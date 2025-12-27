@@ -162,13 +162,12 @@ export default function Dashboard() {
                         <p className="ai-loading">⏳ Генерация решения...</p>
                       ) : aiSolutions[task.id] ? (
                         <p className={
-                          aiSolutions[task.id].includes('Ой, ошибка') ||
-                          aiSolutions[task.id].includes('❌')
+                          aiSolutions[task.id].includes('Не удалось получить данные')
                             ? 'ai-error'
                             : ''
                         }>{aiSolutions[task.id]}</p>
                       ) : (
-                        <p className="ai-error">❌ Решение недоступно</p>
+                        <p className="ai-error">Не удалось получить данные от AI</p>
                       )}
                     </div>
                   )}

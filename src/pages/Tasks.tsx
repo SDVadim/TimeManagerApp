@@ -50,13 +50,12 @@ export default function Tasks() {
                     <p className="ai-loading">⏳ Генерация решения...</p>
                   ) : aiSolutions[t.id] ? (
                     <p className={
-                      aiSolutions[t.id].includes('Ой, ошибка') ||
-                      aiSolutions[t.id].includes('❌')
+                      aiSolutions[t.id].includes('Не удалось получить данные')
                         ? 'ai-error'
                         : ''
                     }>{aiSolutions[t.id]}</p>
                   ) : (
-                    <p className="ai-error">❌ Решение недоступно</p>
+                    <p className="ai-error">Не удалось получить данные от AI</p>
                   )}
                 </div>
               )}

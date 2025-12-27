@@ -7,7 +7,7 @@ const openai = new OpenAI({
 export async function generateTaskSolution(taskTitle: string, taskNotes?: string): Promise<string> {
   try {
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
-      return 'Для использования AI-решений необходимо настроить OPENAI_API_KEY в файле .env';
+      return 'Не удалось получить данные от AI';
     }
 
     const prompt = `Ты - помощник для студентов. Тебе дана задача: "${taskTitle}"${
@@ -30,11 +30,10 @@ export async function generateTaskSolution(taskTitle: string, taskNotes?: string
       temperature: 0.7,
     });
 
-    return completion.choices[0]?.message?.content || 'Не удалось сгенерировать решение';
+    return completion.choices[0]?.message?.content || 'Не удалось получить данные от AI';
   } catch (error: any) {
     console.error('OpenAI API error:', error);
-
-    return `Ой, ошибка подключения к AI!`;
+    return 'Не удалось получить данные от AI';
   }
 }
 
