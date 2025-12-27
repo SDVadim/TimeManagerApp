@@ -20,13 +20,17 @@ interface TasksState {
   archivedItems: Task[]
   loading: boolean
   error: string | null
+  aiSolutions: Record<number, string>
+  loadingAiSolution: boolean
 }
 
 const initialState: TasksState = {
   items: [],
   archivedItems: [],
   loading: false,
-  error: null
+  error: null,
+  aiSolutions: {},
+  loadingAiSolution: false
 }
 
 const API_URL = 'http://localhost:4000/api'
@@ -61,6 +65,11 @@ export const deleteTask = createAsyncThunk('tasks/delete', async (id: number) =>
   return id
 })
 
+export const fetchAiSolution = createAsyncThunk('tasks/aiSolution', async (taskId: number) => {
+  const res = await axios.post<{ solution: string }>(`${API_URL}/tasks/${taskId}/ai-solution`)
+  return { taskId, solution: res.data.solution }
+})
+
 const slice = createSlice({
   name: 'tasks',
   initialState,
@@ -93,6 +102,16 @@ const slice = createSlice({
       })
       .addCase(deleteTask.fulfilled, (state, action: PayloadAction<number>) => {
         state.items = state.items.filter((t) => t.id !== action.payload)
+      })
+      .addCase(fetchAiSolution.pending, (state) => {
+        state.loadingAiSolution = true
+      })
+      .addCase(fetchAiSolution.fulfilled, (state, action: PayloadAction<{ taskId: number; solution: string }>) => {
+        state.aiSolutions[action.payload.taskId] = action.payload.solution
+        state.loadingAiSolution = false
+      })
+      .addCase(fetchAiSolution.rejected, (state) => {
+        state.loadingAiSolution = false
       })
   }
 })
