@@ -55,7 +55,7 @@ export default function Register() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="username">Имя пользователя</label>
+            <label htmlFor="username">Логин</label>
             <input
               id="username"
               type="text"

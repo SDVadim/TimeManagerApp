@@ -40,13 +40,13 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
-            <label htmlFor="username">Имя пользователя</label>
+            <label htmlFor="username">Логин</label>
             <input
               id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Введите имя пользователя"
+              placeholder="Введите логин"
               required
               autoFocus
             />
